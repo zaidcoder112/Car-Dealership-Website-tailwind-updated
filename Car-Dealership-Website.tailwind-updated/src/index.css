@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* ── Tailwind v4: use class-based dark mode (.dark on <html>) ── */
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  @apply bg-white text-gray-900;
+}
+
+.dark {
+  @apply bg-gray-950 text-gray-100;
+}
+
+body {
+  @apply font-sans antialiased;
+}
