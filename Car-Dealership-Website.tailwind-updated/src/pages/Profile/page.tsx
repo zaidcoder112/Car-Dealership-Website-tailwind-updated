@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 
@@ -30,6 +30,21 @@ export default function Profile() {
   const [editing, setEditing] = useState(false)
   const [form, setForm] = useState({ name: '', phone: '', location: '', bio: '' })
   const [saved, setSaved] = useState(false)
+  const [avatarUploading, setAvatarUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) { alert('Image must be under 5MB'); return }
+    setAvatarUploading(true)
+    const reader = new FileReader()
+    reader.onload = () => {
+      updateUser({ avatar: reader.result as string })
+      setAvatarUploading(false)
+    }
+    reader.readAsDataURL(file)
+  }
 
   // ── Not logged in ─────────────────────────────────────────────────────────
   if (!isLoggedIn || !user) {
@@ -108,11 +123,34 @@ export default function Profile() {
           <div className="h-32 bg-gradient-to-r from-[#E63946] via-[#c62b37] to-[#0f0f0f]" />
           <div className="px-6 sm:px-8 pb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5 -mt-12 mb-6">
-              <img
-                src={user.avatar}
-                alt={user.name}
-                className="w-24 h-24 rounded-2xl border-4 border-white dark:border-gray-900 object-cover shadow-lg"
-              />
+              {/* Avatar with upload overlay */}
+              <div className="relative flex-shrink-0 group">
+                <img
+                  src={user.avatar}
+                  alt={user.name}
+                  className="w-24 h-24 rounded-2xl border-4 border-white dark:border-gray-900 object-cover shadow-lg"
+                />
+                {/* Camera overlay */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={avatarUploading}
+                  className="absolute inset-0 rounded-2xl bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-none"
+                  title="Change profile picture"
+                >
+                  {avatarUploading
+                    ? <span className="text-white text-lg animate-spin">⟳</span>
+                    : <span className="text-white text-2xl">📷</span>
+                  }
+                </button>
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </div>
               <div className="flex-1 sm:pb-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h1 className="text-2xl font-black text-gray-900 dark:text-white">{user.name}</h1>

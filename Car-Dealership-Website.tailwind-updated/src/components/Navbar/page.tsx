@@ -8,7 +8,7 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { theme, toggleTheme } = useTheme()
   const { isLoggedIn, user, logout } = useAuth()
-  const { cart } = useCart()
+  const { totalItems } = useCart()
   const navigate = useNavigate()
 
   const close = () => setMenuOpen(false)
@@ -73,9 +73,9 @@ function Navbar() {
         <li className="max-md:w-full max-md:text-center max-md:py-1 px-3">
           <Link to="/cart" className="relative text-white hover:text-[#E63946] transition-colors" onClick={close}>
             🛒
-            {cart.length > 0 && (
+            {totalItems > 0 && (
               <span className="absolute -top-2 -right-2 bg-[#E63946] text-white text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
-                {cart.length}
+                {totalItems > 9 ? '9+' : totalItems}
               </span>
             )}
           </Link>
